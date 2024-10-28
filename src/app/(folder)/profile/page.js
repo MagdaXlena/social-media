@@ -1,5 +1,7 @@
 import { connect } from "@/lib/connect";
 import { auth } from "@clerk/nextjs/server"
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default function ProfilePage() {
     const { userId } = auth();
@@ -15,6 +17,7 @@ export default function ProfilePage() {
 
         await db.query(`INSERT INTO PROFILES (clerk_id,username, bio) VALUES ($1, $2, $3)`, [userId, username, bio]
         );
+
     } else {
         await db.query(`UPDATE profiles SET username = $1, bio =$2 WHERE clerk_id=$3`, [username, bio, userId]
         );

@@ -1,5 +1,7 @@
 import { connect } from "@/lib/connect";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default async function PostsPage() {
     const {userId} = auth();
@@ -16,8 +18,11 @@ export default async function PostsPage() {
         "use server";
         const db = connect();
         const content = formData.get("content")        
-        await db.query('INSERT INTO posts (clerk_id, content) VALUES ($1, $2)', [userId, content])
-    }
+        await db.query('INSERT INTO posts (clerk_id, content) VALUES ($1, $2)', [userId, content]);
+
+        revalidatePath("/");
+        redirect("/");
+    };
 
     return (
         <div className="bg-gray-200 h-screen rounded-xl p-4 text-black">
